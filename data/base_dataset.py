@@ -20,6 +20,9 @@ def get_transform(opt):
         osize = [opt.loadSize, opt.loadSize]
         transform_list.append(transforms.Scale(osize, Image.BICUBIC))
         transform_list.append(transforms.RandomCrop(opt.fineSize))
+        # TODO try horizontal flip
+        # TODO try rotation here
+        # TODO try RandomResizedCrop with  interpolation=Image.ANTIALIAS
     elif opt.resize_or_crop == 'crop':
         transform_list.append(transforms.RandomCrop(opt.fineSize))
     elif opt.resize_or_crop == 'scale_width':
