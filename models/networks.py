@@ -251,20 +251,15 @@ class ResnetGenerator(nn.Module):
         self.model = nn.Sequential(*model)
 
     def forward(self, input, classes):
-        if classes=='A':
-            label=1
-        else:
-            label=0
-        self.n_classes=2
-        classes = torch.LongTensor([label]).cuda()  # assume batch size =1
-        classes = torch.autograd.Variable(classes)
+
+        
         from utils import one_hot
         classes = one_hot(classes, self.n_classes)
+
         classes = classes.unsqueeze(2).unsqueeze(3)
         classes = classes.expand(classes.size(0), classes.size(1), input.size(2), input.size(3))
         
         input = torch.cat([input, classes], dim=1)
-
 
         if self.gpu_ids and isinstance(input.data, torch.cuda.FloatTensor):
             return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
@@ -447,17 +442,12 @@ class NLayerDiscriminator(nn.Module):
 
     def forward(self, input, classes):
 
-        if classes=='A':
-            label=1
-        else:
-            label=0
-        self.n_classes=2
-        classes = torch.LongTensor([label]).cuda()  # assume batch size =1
-        classes = torch.autograd.Variable(classes)
         from utils import one_hot
         classes = one_hot(classes, self.n_classes)
+
         classes = classes.unsqueeze(2).unsqueeze(3)
         classes = classes.expand(classes.size(0), classes.size(1), input.size(2), input.size(3))
+        
         input = torch.cat([input, classes], dim=1)
         
         if len(self.gpu_ids) and isinstance(input.data, torch.cuda.FloatTensor):

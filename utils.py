@@ -10,16 +10,15 @@ def to_var(x, requires_grad=False, volatile=False):
     return x
 
 
-def one_hot(x, n_classes):
-    if isinstance(x, Variable):
-        is_var = True
-        x = x.data
-    else:
-        is_var = False
+def one_hot(x,n_classes):
+    x = x.data
     x_one_hot = torch.zeros(x.size(0), n_classes)
+
     if torch.cuda.is_available():
         x_one_hot = x_one_hot.cuda()
-    x_one_hot.scatter_(1, x.unsqueeze(1), 1)
-    if is_var:
-        x_one_hot = Variable(x_one_hot)
+
+    x_one_hot.scatter_(1, x, 1)
+
+    x_one_hot = Variable(x_one_hot)
+
     return x_one_hot
