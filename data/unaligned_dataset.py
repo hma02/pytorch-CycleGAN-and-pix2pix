@@ -87,9 +87,9 @@ class UnalignedDatasetHalf(BaseDataset):
         self.transform = get_transform(opt)
 
     def __getitem__(self, index):
-
-        class_A = 0 #random.randint(0,len(self.data)-1)
-        class_B = 1 #random.randint(0,len(self.data)-1)
+        # TODO randomize class selection
+        class_A = random.randint(0,len(self.data)-1)
+        class_B = random.randint(0,len(self.data)-1)
         while class_B==class_A:
             class_B = random.randint(0,len(self.data)-1)
 
