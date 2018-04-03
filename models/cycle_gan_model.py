@@ -68,6 +68,8 @@ class CycleGANModel(BaseModel):
         self.input_B = input_B
         self.label_A = input['A_label'].cuda()
         self.label_B = input['B_label'].cuda()
+        self.path_A = input['A_paths']
+        self.path_B = input['B_paths']
         self.image_paths = input['A_paths']
 
     def forward(self):
@@ -91,7 +93,7 @@ class CycleGANModel(BaseModel):
     def get_image_paths(self):
         return self.image_paths
 
-    def backward_D_basic(self, netD, condition ,real, fake):
+    def backward_D_basic(self, netD, condition, real, fake):
         # Real
         pred_real = netD(real, condition)
         loss_D_real = self.criterionGAN(pred_real, True)
@@ -199,11 +201,16 @@ class CycleGANModel(BaseModel):
         real_B = util.tensor2im(self.input_B)
         fake_A = util.tensor2im(self.fake_A)
         rec_B = util.tensor2im(self.rec_B)
-        ret_visuals = OrderedDict([('real_A', real_A), ('fake_B', fake_B), ('rec_A', rec_A),
-                                   ('real_B', real_B), ('fake_A', fake_A), ('rec_B', rec_B)])
+
+        ret_visuals = OrderedDict([('real_A:'+self.path_A[0], real_A), ('fake_B', fake_B), ('rec_A', rec_A),
+                                   ('real_B:'+self.path_B[0], real_B), ('fake_A', fake_A), ('rec_B', rec_B)])
+
         if self.opt.isTrain and self.opt.lambda_identity > 0.0:
-            ret_visuals['idt_A'] = util.tensor2im(self.idt_A)
-            ret_visuals['idt_B'] = util.tensor2im(self.idt_B)
+
+            ret_visuals = OrderedDict([('real_A:'+self.path_A[0], real_A), ('fake_B', fake_B), ('rec_A', rec_A), ('idt_B', util.tensor2im(self.idt_B)),
+                                       ('real_B:'+self.path_B[0], real_B), ('fake_A', fake_A), ('rec_B', rec_B), ('idt_A', util.tensor2im(self.idt_A)) 
+                                    ])
+        
         return ret_visuals
 
     def save(self, label):

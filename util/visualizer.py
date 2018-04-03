@@ -5,7 +5,7 @@ import time
 from . import util
 from . import html
 from scipy.misc import imresize
-
+from shutil import copyfile
 
 class Visualizer():
     def __init__(self, opt):
@@ -79,8 +79,21 @@ class Visualizer():
         if self.use_html and (save_result or not self.saved):  # save images to a html file
             self.saved = True
             for label, image_numpy in visuals.items():
-                img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, label))
+
+                res = label.split(':')
+
+                img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, res[0]))
                 util.save_image(image_numpy, img_path)
+
+                if len(res) == 2:
+                    image_name = res[1].split('/')[-1].split('.jpg')[0]
+
+                    webapi_name = './datasets/staff_makeup/web/' + image_name + '_web.jpg'
+                    img_path = os.path.join(self.img_dir, 'epoch%.3d_%s_web.png' % (epoch, res[0]))
+
+                    if os.path.isfile(webapi_name):
+                        copyfile(webapi_name, img_path)
+
             # update website
             webpage = html.HTML(self.web_dir, 'Experiment name = %s' % self.name, reflesh=1)
             for n in range(epoch, 0, -1):
@@ -90,10 +103,18 @@ class Visualizer():
                 links = []
 
                 for label, image_numpy in visuals.items():
+                    label = label.split(':')[0]
                     img_path = 'epoch%.3d_%s.png' % (n, label)
                     ims.append(img_path)
                     txts.append(label)
                     links.append(img_path)
+
+                    if label in ['real_A', 'real_B']:
+                        img_path = os.path.join('epoch%.3d_%s_web.png' % (n, label))
+                        ims.append(img_path)
+                        txts.append(label+'_web')
+                        links.append(img_path)
+
                 webpage.add_images(ims, txts, links, width=self.win_size)
             webpage.save()
 
