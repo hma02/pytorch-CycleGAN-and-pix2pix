@@ -78,12 +78,13 @@ class Visualizer():
 
         if self.use_html and (save_result or not self.saved):  # save images to a html file
             self.saved = True
-            for label, image_numpy in visuals.items():
+            for label, (image_numpy,cls) in visuals.items():
 
                 res = label.split(':')
 
                 img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, res[0]))
                 util.save_image(image_numpy, img_path)
+                np.savetxt(os.path.join(self.img_dir, 'epoch%.3d_%s.txt' % (epoch, res[0])), cls, fmt='%d')
 
                 if len(res) == 2:
                     image_name = res[1].split('/')[-1].split('.jpg')[0]
@@ -102,17 +103,18 @@ class Visualizer():
                 txts = []
                 links = []
 
-                for label, image_numpy in visuals.items():
+                for label, (image_numpy, cls) in visuals.items():
                     label = label.split(':')[0]
                     img_path = 'epoch%.3d_%s.png' % (n, label)
                     ims.append(img_path)
-                    txts.append(label)
+                    cls_read = np.loadtxt(os.path.join(self.img_dir, 'epoch%.3d_%s.txt' % (n, label)))
+                    txts.append(label+':%d' % cls_read)
                     links.append(img_path)
 
                     if label in ['real_A', 'real_B']:
                         img_path = os.path.join('epoch%.3d_%s_web.png' % (n, label))
                         ims.append(img_path)
-                        txts.append(label+'_web')
+                        txts.append(label+'_web:1') # the web generated one is the current tech to overlay class 1 lisptic
                         links.append(img_path)
 
                 webpage.add_images(ims, txts, links, width=self.win_size)

@@ -93,11 +93,10 @@ class UnalignedDatasetHalf(BaseDataset):
 
     def __getitem__(self, index):
         # TODO randomize class selection
-        class_A = 0 #random.randint(0,len(self.data)-1)
+        class_A = random.randint(0,len(self.data)-1)  #TODO try random 2 here if (0, random other) doesn't work
         class_B = random.randint(0,len(self.data)-1)
         while class_B==class_A:
             class_B = random.randint(0,len(self.data)-1)
-
         self.A_size = len(self.data[class_A])
         self.B_size = len(self.data[class_B])
         index_A = index

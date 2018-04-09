@@ -66,8 +66,8 @@ class CycleGANModel(BaseModel):
             input_B = input_B.cuda(self.gpu_ids[0], async=True)
         self.input_A = input_A
         self.input_B = input_B
-        self.label_A = input['A_label'].cuda()
-        self.label_B = input['B_label'].cuda()
+        self.label_A = input['A_label']
+        self.label_B = input['B_label']
         self.path_A = input['A_paths']
         self.path_B = input['B_paths']
         self.image_paths = input['A_paths']
@@ -75,8 +75,8 @@ class CycleGANModel(BaseModel):
     def forward(self):
         self.real_A = Variable(self.input_A)
         self.real_B = Variable(self.input_B)
-        self.real_A_label = Variable(self.label_A)
-        self.real_B_label = Variable(self.label_B)
+        self.real_A_label = Variable(self.label_A.cuda())
+        self.real_B_label = Variable(self.label_B.cuda())
 
     def test(self):
         real_A = Variable(self.input_A, volatile=True)
@@ -202,13 +202,13 @@ class CycleGANModel(BaseModel):
         fake_A = util.tensor2im(self.fake_A)
         rec_B = util.tensor2im(self.rec_B)
 
-        ret_visuals = OrderedDict([('real_A:'+self.path_A[0], real_A), ('fake_B', fake_B), ('rec_A', rec_A),
-                                   ('real_B:'+self.path_B[0], real_B), ('fake_A', fake_A), ('rec_B', rec_B)])
+        ret_visuals = OrderedDict([('real_A:'+self.path_A[0], [real_A,self.label_A]), ('fake_B', [fake_B, self.label_B]), ('rec_A', [rec_A,self.label_A]),
+                                   ('real_B:'+self.path_B[0], [real_B,self.label_B]), ('fake_A', [fake_A, self.label_A]), ('rec_B', [rec_B,self.label_B])])
 
         if self.opt.isTrain and self.opt.lambda_identity > 0.0:
 
-            ret_visuals = OrderedDict([('real_A:'+self.path_A[0], real_A), ('fake_B', fake_B), ('rec_A', rec_A), ('idt_B', util.tensor2im(self.idt_B)),
-                                       ('real_B:'+self.path_B[0], real_B), ('fake_A', fake_A), ('rec_B', rec_B), ('idt_A', util.tensor2im(self.idt_A)) 
+            ret_visuals = OrderedDict([('real_A:'+self.path_A[0], [real_A,self.label_A]), ('fake_B', [fake_B,self.label_B]), ('rec_A', [rec_A,self.label_A]), ('idt_B', [util.tensor2im(self.idt_B),self.label_B]),
+                                       ('real_B:'+self.path_B[0], [real_B,self.label_B]), ('fake_A', [fake_A,self.label_A]), ('rec_B', [rec_B,self.label_B]), ('idt_A', [util.tensor2im(self.idt_A),self.label_A]) 
                                     ])
         
         return ret_visuals
