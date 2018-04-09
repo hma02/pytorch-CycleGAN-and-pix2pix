@@ -75,8 +75,13 @@ class UnalignedDatasetHalf(BaseDataset):
             images = os.listdir(os.path.join(directory, c))
             images = [os.path.join(directory, c, img) for img in images if '.jpg' in img]
             self.data.append([{'image': img, 'label': i} for img in images])
-        # 
 
+        if opt.n_classes!=None:
+            assert(opt.n_classes == len(classes))
+        else:
+            opt.n_classes = len(classes)
+
+        # 
 
         # self.A_paths = make_dataset(self.dir_A)
         # self.B_paths = make_dataset(self.dir_B)
@@ -88,7 +93,7 @@ class UnalignedDatasetHalf(BaseDataset):
 
     def __getitem__(self, index):
         # TODO randomize class selection
-        class_A = random.randint(0,len(self.data)-1)
+        class_A = 0 #random.randint(0,len(self.data)-1)
         class_B = random.randint(0,len(self.data)-1)
         while class_B==class_A:
             class_B = random.randint(0,len(self.data)-1)

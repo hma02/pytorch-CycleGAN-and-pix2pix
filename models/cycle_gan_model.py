@@ -19,13 +19,13 @@ class CycleGANModel(BaseModel):
         # Code (paper): G_A (G), G_B (F), D_A (D_Y), D_B (D_X)
 
         self.netG = networks.define_G(opt.input_nc, opt.output_nc,
-                                        opt.ngf, opt.which_model_netG, opt.norm, not opt.no_dropout, opt.init_type, self.gpu_ids)
+                                        opt.ngf, opt.which_model_netG, opt.norm, not opt.no_dropout, opt.init_type, self.gpu_ids, opt.n_classes)
 
         if self.isTrain:
             use_sigmoid = opt.no_lsgan
             self.netD = networks.define_D(opt.output_nc, opt.ndf,
                                             opt.which_model_netD,
-                                            opt.n_layers_D, opt.norm, use_sigmoid, opt.init_type, self.gpu_ids)
+                                            opt.n_layers_D, opt.norm, use_sigmoid, opt.init_type, self.gpu_ids, opt.n_classes)
 
         if not self.isTrain or opt.continue_train:
             which_epoch = opt.which_epoch

@@ -98,7 +98,7 @@ def get_scheduler(optimizer, opt):
     return scheduler
 
 
-def define_G(input_nc, output_nc, ngf, which_model_netG, norm='batch', use_dropout=False, init_type='normal', gpu_ids=[]):
+def define_G(input_nc, output_nc, ngf, which_model_netG, norm='batch', use_dropout=False, init_type='normal', gpu_ids=[], n_classes=2):
     netG = None
     use_gpu = len(gpu_ids) > 0
     norm_layer = get_norm_layer(norm_type=norm)
@@ -107,13 +107,13 @@ def define_G(input_nc, output_nc, ngf, which_model_netG, norm='batch', use_dropo
         assert(torch.cuda.is_available())
 
     if which_model_netG == 'resnet_9blocks':
-        netG = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9, gpu_ids=gpu_ids)
+        netG = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=9, gpu_ids=gpu_ids, n_classes=n_classes)
     elif which_model_netG == 'resnet_6blocks':
-        netG = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6, gpu_ids=gpu_ids)
+        netG = ResnetGenerator(input_nc, output_nc, ngf, norm_layer=norm_layer, use_dropout=use_dropout, n_blocks=6, gpu_ids=gpu_ids, n_classes=n_classes)
     elif which_model_netG == 'unet_128':
-        netG = UnetGenerator(input_nc, output_nc, 7, ngf, norm_layer=norm_layer, use_dropout=use_dropout, gpu_ids=gpu_ids)
+        netG = UnetGenerator(input_nc, output_nc, 7, ngf, norm_layer=norm_layer, use_dropout=use_dropout, gpu_ids=gpu_ids, n_classes=n_classes)
     elif which_model_netG == 'unet_256':
-        netG = UnetGenerator(input_nc, output_nc, 8, ngf, norm_layer=norm_layer, use_dropout=use_dropout, gpu_ids=gpu_ids)
+        netG = UnetGenerator(input_nc, output_nc, 8, ngf, norm_layer=norm_layer, use_dropout=use_dropout, gpu_ids=gpu_ids, n_classes=n_classes)
     else:
         raise NotImplementedError('Generator model name [%s] is not recognized' % which_model_netG)
     if len(gpu_ids) > 0:
@@ -123,7 +123,7 @@ def define_G(input_nc, output_nc, ngf, which_model_netG, norm='batch', use_dropo
 
 
 def define_D(input_nc, ndf, which_model_netD,
-             n_layers_D=3, norm='batch', use_sigmoid=False, init_type='normal', gpu_ids=[]):
+             n_layers_D=3, norm='batch', use_sigmoid=False, init_type='normal', gpu_ids=[],  n_classes=2):
     netD = None
     use_gpu = len(gpu_ids) > 0
     norm_layer = get_norm_layer(norm_type=norm)
@@ -131,11 +131,11 @@ def define_D(input_nc, ndf, which_model_netD,
     if use_gpu:
         assert(torch.cuda.is_available())
     if which_model_netD == 'basic':
-        netD = NLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer, use_sigmoid=use_sigmoid, gpu_ids=gpu_ids)
+        netD = NLayerDiscriminator(input_nc, ndf, n_layers=3, norm_layer=norm_layer, use_sigmoid=use_sigmoid, gpu_ids=gpu_ids, n_classes=n_classes)
     elif which_model_netD == 'n_layers':
-        netD = NLayerDiscriminator(input_nc, ndf, n_layers_D, norm_layer=norm_layer, use_sigmoid=use_sigmoid, gpu_ids=gpu_ids)
+        netD = NLayerDiscriminator(input_nc, ndf, n_layers_D, norm_layer=norm_layer, use_sigmoid=use_sigmoid, gpu_ids=gpu_ids, n_classes=n_classes)
     elif which_model_netD == 'pixel':
-        netD = PixelDiscriminator(input_nc, ndf, norm_layer=norm_layer, use_sigmoid=use_sigmoid, gpu_ids=gpu_ids)
+        netD = PixelDiscriminator(input_nc, ndf, norm_layer=norm_layer, use_sigmoid=use_sigmoid, gpu_ids=gpu_ids, n_classes=n_classes)
     else:
         raise NotImplementedError('Discriminator model name [%s] is not recognized' %
                                   which_model_netD)
