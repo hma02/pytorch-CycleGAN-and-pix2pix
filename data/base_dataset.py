@@ -22,6 +22,9 @@ def get_transform(opt):
         transform_list.append(transforms.RandomCrop(opt.fineSize))
         # TODO try rotation here
         # TODO try RandomResizedCrop with  interpolation=Image.ANTIALIAS
+    if opt.resize_or_crop == 'resize':
+        osize = [opt.loadSize_h, opt.loadSize_w]
+        transform_list.append(transforms.Resize(osize, Image.ANTIALIAS))
     elif opt.resize_or_crop == 'crop':
         transform_list.append(transforms.RandomCrop(opt.fineSize))
     elif opt.resize_or_crop == 'scale_width':
